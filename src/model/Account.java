@@ -30,17 +30,19 @@ public class Account {
     cash += value;
   }
 
-  // For accounts that have incomeCalc based on days
+  @Override
+  public String toString() {
+    return "Numero: " + number + ", " + "Saldo: " + cash + ", Tipo: " + type + ", Agencia: " + agency;
+  }
+
   public double incomeCalc(double cdi, int days) {
     return type.incomeCalc(cash, cdi, days);
   }
 
-  // For accounts that have incomeCalc based on months, such as AUTO
   public double incomeCalc(double cdi, int months, boolean isLegal) {
     if (type == AccountType.AUTO) {
       return type.incomeCalc(cash, cdi, months, isLegal);
     }
-    // For other account types that do not support this calculation
     throw new UnsupportedOperationException("Este método não é suportado para este tipo de conta.");
   }
 }

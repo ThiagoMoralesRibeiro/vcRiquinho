@@ -4,13 +4,11 @@ public enum AccountType {
   CHECKING {
     @Override
     public double incomeCalc(double cash, double cdi, int days) {
-      // For CHECKING account, income is simply the cash (no interest)
       return cash;
     }
 
     @Override
-    public double incomeCalc(double cash, double cdi, int months, boolean isLegal) {
-      // CHECKING doesn't support income calculation by months
+    public double incomeCalc(double cash, double cdi, int days, boolean isLegal) {
       throw new UnsupportedOperationException("Método não suportado para este tipo de conta.");
     }
   },
@@ -18,15 +16,15 @@ public enum AccountType {
   CDI {
     @Override
     public double incomeCalc(double cash, double cdi, int days) {
-      // For CDI account, income is based on daily calculation
-      double income = cash * Math.pow(1 + (cdi / 30), days);
-      double tax = income * 0.0007;
-      return income - tax;
+      double cdiDaily = cdi / 30;
+      double incomeBrute = cash * Math.pow(1 + cdiDaily, days);
+      double incomeLiquid = incomeBrute - cash;
+      double tax = incomeLiquid * 0.0007;
+      return incomeBrute - tax;
     }
 
     @Override
-    public double incomeCalc(double cash, double cdi, int months, boolean isLegal) {
-      // CDI doesn't support monthly calculations
+    public double incomeCalc(double cash, double cdi, int days, boolean isLegal) {
       throw new UnsupportedOperationException("Método não suportado para este tipo de conta.");
     }
   },
@@ -34,22 +32,23 @@ public enum AccountType {
   AUTO {
     @Override
     public double incomeCalc(double cash, double cdi, int days) {
-      // AUTO account supports income calculation by days
-      double income = cash * Math.pow(1 + (cdi / 30), days);
-      double tax = income * 0.0007;
-      return income - tax;
+      double cdiDaily = cdi / 30;
+      double incomeBrute = cash * Math.pow(1 + cdiDaily, days);
+      double incomeLiquid = incomeBrute - cash;
+      double tax = incomeLiquid * 0.0007;
+      return incomeBrute - tax;
     }
 
     @Override
-    public double incomeCalc(double cash, double cdi, int months, boolean isLegal) {
-      // For AUTO account, the income is calculated monthly with legal tax condition
-      double income = cash * Math.pow(1 + cdi, months);
-      double tax = isLegal ? income * 0.0015 : income * 0.001;
-      return income - tax;
+    public double incomeCalc(double cash, double cdi, int days, boolean isLegal) {
+      double months = days / 30;
+      double incomeBrute = cash * Math.pow(1 + cdi, months);
+      double incomeLiquid = incomeBrute - cash;
+      double tax = isLegal ? incomeLiquid * 0.0015 : incomeLiquid * 0.001;
+      return incomeBrute - tax;
     }
   };
 
-  // Abstract methods that must be implemented by each enum constant
   public abstract double incomeCalc(double cash, double cdi, int days);
 
   public abstract double incomeCalc(double cash, double cdi, int months, boolean isLegal);
